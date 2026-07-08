@@ -236,7 +236,7 @@
         {{-- 6. สถานะพร้อมขาย (เปลี่ยนมาใช้ตัวแปร is_available ตามเงื่อนไข $request->has('is_available') ของคุณ) --}}
         <div class="form-group" style="margin-top: 25px;">
             <label class="switch-container">
-                <input type="checkbox" name="is_available" value="1" {{ old('is_available', '1') == '1' ? 'checked' : '' }} style="width: 18px; height: 18px; accent-color: #6f4e37; cursor: pointer;">
+                <input type="checkbox" name="status" value="1" {{ old('status', '1') == '1' ? 'checked' : '' }} style="width: 18px; height: 18px; accent-color: #6f4e37; cursor: pointer;">
                 <span class="switch-text">🟢 เปิดขายเมนูนี้ทันที (Available)</span>
             </label>
         </div>

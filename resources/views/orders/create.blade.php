@@ -33,7 +33,7 @@
             <div class="menu-grid" id="menuGrid">
                 @foreach($products as $product)
                     {{-- 🛠️ ตรวจสอบสถานะ: แสดงเฉพาะสินค้าที่พร้อมขาย (is_available == 1) --}}
-                    @if($product->is_available)
+                    @if($product->status)
                         {{-- 🛠️ แก้ไข: เปลี่ยนจาก $product->category->name เป็น $product->category สตริงตรงๆ ตามสเปกตาราง menus --}}
                         <div class="product-card"
                              data-category="{{ $product->category }}"
@@ -144,6 +144,62 @@
         </div>
     </div>
 </div>
+
+{{-- ===== QR CODE MODAL ===== --}}
+<div id="qrModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <h2 style="margin-bottom: 15px; color: #155724; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c5/PromptPay-logo.png" alt="PromptPay" height="30">
+            สแกนเพื่อโอนเงิน
+        </h2>
+        <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center; border: 2px solid #28a745;">
+            {{-- รูปแบบ QR Code (สามารถใช้ library สร้างจากเบอร์โทรหรือพร้อมเพย์ได้ ในที่นี้ใช้รูปจำลอง) --}}
+            <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" alt="QR Code" style="width: 200px; height: 200px; margin-bottom: 15px;">
+            
+            <div style="font-size: 1.2rem; font-weight: bold; color: #4a3423;">ยอดโอนสุทธิ: <span id="qrTotalDisplay" style="color: #e06a20;">฿0</span></div>
+            <div style="font-size: 0.9rem; color: #666; margin-top: 5px;">บัญชี: 099-999-9999 (ร้านคอฟฟี่ช็อป)</div>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn btn-outline" style="flex: 1;" onclick="closeQrModal()">ยกเลิก</button>
+            <button type="button" class="btn btn-success" style="flex: 2; font-weight: bold;" onclick="confirmQrPayment()">✅ ยืนยันการโอนเงินแล้ว</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .modal-overlay.show {
+        opacity: 1;
+    }
+    .modal-content {
+        background: #fdfbf9;
+        padding: 30px;
+        border-radius: 20px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+    }
+    .modal-overlay.show .modal-content {
+        transform: translateY(0);
+    }
+</style>
 @endsection
 
 @section('scripts')
@@ -424,6 +480,35 @@
         }
     });
 
+    // ===== QR MODAL =====
+    let qrConfirmed = false;
+
+    function showQrModal() {
+        const total = document.getElementById('totalDisplay').textContent;
+        document.getElementById('qrTotalDisplay').textContent = total;
+        
+        const modal = document.getElementById('qrModal');
+        modal.style.display = 'flex';
+        // Trigger reflow for transition
+        void modal.offsetWidth;
+        modal.classList.add('show');
+    }
+
+    function closeQrModal() {
+        const modal = document.getElementById('qrModal');
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+
+    function confirmQrPayment() {
+        qrConfirmed = true;
+        closeQrModal();
+        localStorage.removeItem('coffee_shop_cart');
+        document.getElementById('orderForm').submit();
+    }
+
     // Submit form — update form data first
     document.getElementById('orderForm').addEventListener('submit', function(e) {
         updateFormData();
@@ -431,8 +516,13 @@
             e.preventDefault();
             alert('กรุณาเพิ่มสินค้าลงตะกร้า');
         } else {
-            // Clear localStorage upon successful submission
-            localStorage.removeItem('coffee_shop_cart');
+            if (paymentMethod === 'โอนเงิน' && !qrConfirmed) {
+                e.preventDefault();
+                showQrModal();
+            } else {
+                // Clear localStorage upon successful submission
+                localStorage.removeItem('coffee_shop_cart');
+            }
         }
     });
 </script>

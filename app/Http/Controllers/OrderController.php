@@ -23,7 +23,16 @@ class OrderController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        return view('orders.index', compact('orders', 'status'));
+        $recommendedProducts = Product::where('status', 1)->inRandomOrder()->take(4)->get();
+
+        $bestSellingProducts = Product::where('status', 1)
+            ->withSum('orderItems as total_sold', 'quantity')
+            ->having('total_sold', '>', 0)
+            ->orderByDesc('total_sold')
+            ->take(5)
+            ->get();
+
+        return view('orders.index', compact('orders', 'status', 'recommendedProducts', 'bestSellingProducts'));
     }
 
     /**
@@ -125,6 +134,15 @@ class OrderController extends Controller
     {
         $order->load(['items.product', 'coupon']);
         return view('orders.show', compact('order'));
+    }
+
+    /**
+     * แสดงใบเสร็จรับเงิน
+     */
+    public function receipt(Order $order)
+    {
+        $order->load(['items.product', 'coupon']);
+        return view('orders.receipt', compact('order'));
     }
 
     /**

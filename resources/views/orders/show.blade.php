@@ -18,6 +18,7 @@
         </div>
         <div class="header-actions">
             <a href="{{ route('orders.index') }}" class="btn btn-outline">← กลับรายการ</a>
+            <a href="{{ route('orders.receipt', $order) }}" target="_blank" class="btn btn-primary" style="background-color: #4a3423; color: white;">🖨️ พิมพ์ใบเสร็จ</a>
             <a href="{{ route('orders.create') }}" class="btn btn-primary">🛒 สร้างออเดอร์ใหม่</a>
         </div>
     </div>
@@ -26,7 +27,7 @@
         {{-- Items --}}
         <div class="detail-card">
             {{-- 🛠️ แก้ไข: ดึงผ่าน orderItems --}}
-            <div class="card-title">🛒 รายการสินค้า ({{ $order->orderItems->count() }} รายการ)</div>
+            <div class="card-title">🛒 รายการสินค้า ({{ $order->items->count() }} รายการ)</div>
             <table class="items-table">
                 <thead>
                     <tr>
@@ -39,7 +40,7 @@
                 </thead>
                 <tbody>
                     {{-- 🛠️ แก้ไข: เปลี่ยนมาลูปผ่าน orderItems --}}
-                    @foreach($order->orderItems as $index => $item)
+                    @foreach($order->items as $index => $item)
                         <tr>
                             <td style="color: var(--coffee-400);">{{ $index + 1 }}</td>
                             <td>
@@ -74,7 +75,7 @@
                     <div class="summary-row">
                         <span>ยอดรวม</span>
                         {{-- 🛠️ แก้ไข: กรณีไม่มีฟิลด์ย่อย ให้ใช้ราคาตั้งต้นมาคิดราคา --}}
-                        <span>฿{{ number_format($order->orderItems->sum('subtotal'), 2) }}</span>
+                        <span>฿{{ number_format($order->items->sum('subtotal'), 2) }}</span>
                     </div>
                     @if(isset($order->discount_amount) && $order->discount_amount > 0)
                         <div class="summary-row discount">
@@ -85,7 +86,7 @@
                     <div class="summary-row grand-total">
                         <span>ยอดสุทธิ</span>
                         {{-- 🛠️ แก้ไข: เปลี่ยนเป็น total_price ตามตารางฐานข้อมูล --}}
-                        <span>฿{{ number_format($order->total_price, 2) }}</span>
+                        <span>฿{{ number_format($order->total, 2) }}</span>
                     </div>
                 </div>
 

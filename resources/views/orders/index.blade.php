@@ -246,15 +246,8 @@
         </a>
     </div>
 
-    {{-- ดึงข้อมูลสินค้ามาแสดงเป็นเมนูแนะนำ (สุ่ม 4 รายการ) --}}
-    @php
-        // เช็คว่ามีคลาส Product อยู่จริงเพื่อป้องกัน Error
-        if(class_exists('\App\Models\Product')) {
-            $recommendedProducts = \App\Models\Product::where('status', 1)->inRandomOrder()->take(4)->get();
-        } else {
-            $recommendedProducts = collect(); // ถ้าไม่มีให้เป็นค่าว่าง
-        }
-    @endphp
+
+    {{-- เมนูแนะนำถูกส่งมาจาก OrderController แล้ว --}}
 
     <div class="container-fluid px-0">
         <h3 class="section-title">⭐ เมนูแนะนำประจำวัน</h3>
@@ -286,6 +279,158 @@
                     <p>กรุณาเพิ่มสินค้าหลังบ้านเพื่อให้แสดงเป็นเมนูแนะนำ</p>
                 </div>
             @endforelse
+        </div>
+    </div>
+
+    {{-- เมนูขายดี (Best Selling Dashboard) --}}
+    <div class="container-fluid px-0" style="margin-top: 40px; margin-bottom: 20px;">
+        <h3 class="section-title">🔥 เมนูขายดีที่สุด</h3>
+        <p class="section-subtitle">เมนูฮิตยอดนิยมที่ลูกค้าสั่งมากที่สุด</p>
+
+        @if($bestSellingProducts->count() > 0)
+            <div style="max-width: 800px; margin: 0 auto; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #f0e6dd;">
+                <canvas id="bestSellingChart"></canvas>
+            </div>
+            
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const ctx = document.getElementById('bestSellingChart').getContext('2d');
+                    
+                    const labels = {!! json_encode($bestSellingProducts->pluck('name')) !!};
+                    const data = {!! json_encode($bestSellingProducts->pluck('total_sold')) !!};
+                    
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'จำนวนแก้วที่ขายได้',
+                                data: data,
+                                backgroundColor: [
+                                    'rgba(255, 140, 66, 0.7)',
+                                    'rgba(111, 78, 55, 0.7)',
+                                    'rgba(197, 155, 39, 0.7)',
+                                    'rgba(140, 98, 57, 0.7)',
+                                    'rgba(200, 160, 140, 0.7)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 140, 66, 1)',
+                                    'rgba(111, 78, 55, 1)',
+                                    'rgba(197, 155, 39, 1)',
+                                    'rgba(140, 98, 57, 1)',
+                                    'rgba(200, 160, 140, 1)'
+                                ],
+                                borderWidth: 1,
+                                borderRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Top 5 เมนูขายดีที่สุด',
+                                    font: {
+                                        size: 16,
+                                        family: "'Sarabun', sans-serif"
+                                    },
+                                    color: '#4a3423'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1,
+                                        font: { family: "'Sarabun', sans-serif" }
+                                    },
+                                    grid: { color: '#f5eee6' }
+                                },
+                                x: {
+                                    ticks: { font: { family: "'Sarabun', sans-serif" } },
+                                    grid: { display: false }
+                                }
+                            }
+                        }
+                    });
+                });
+            </script>
+        @else
+            <div class="rec-empty">
+                <span>📊</span>
+                <h4>ยังไม่มีข้อมูลยอดขาย</h4>
+                <p>เมื่อมีออเดอร์เข้ามา กราฟสินค้าขายดีจะแสดงที่นี่</p>
+            </div>
+        @endif
+    </div>
+
+    {{-- ประวัติการสั่งซื้อ (Order History) --}}
+    <div class="container-fluid px-0" style="margin-top: 50px; margin-bottom: 40px;">
+        <h3 class="section-title">🕒 ประวัติการสั่งซื้อ</h3>
+        <p class="section-subtitle">รายการออเดอร์ทั้งหมดที่เคยสั่งซื้อ</p>
+
+        <div style="background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #f0e6dd; overflow: hidden;">
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background-color: #FFF9F3; border-bottom: 2px solid #FFE8D6;">
+                            <th style="padding: 14px 20px; text-align: left; color: #E06A20; font-weight: 600;">เลขออเดอร์</th>
+                            <th style="padding: 14px 20px; text-align: left; color: #E06A20; font-weight: 600;">วันที่สั่งซื้อ</th>
+                            <th style="padding: 14px 20px; text-align: left; color: #E06A20; font-weight: 600;">ลูกค้า</th>
+                            <th style="padding: 14px 20px; text-align: left; color: #E06A20; font-weight: 600;">รายการ</th>
+                            <th style="padding: 14px 20px; text-align: right; color: #E06A20; font-weight: 600;">ยอดสุทธิ</th>
+                            <th style="padding: 14px 20px; text-align: center; color: #E06A20; font-weight: 600;">สถานะ</th>
+                            <th style="padding: 14px 20px; text-align: center; color: #E06A20; font-weight: 600;">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($orders as $order)
+                            <tr style="border-bottom: 1px solid #FFF1E3; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#FFF9F3'" onmouseout="this.style.backgroundColor='transparent'">
+                                <td style="padding: 14px 20px; font-weight: 700; color: #4a3423;">{{ $order->order_number }}</td>
+                                <td style="padding: 14px 20px; color: #666;">{{ $order->created_at->format('d/m/Y H:i') }}</td>
+                                <td style="padding: 14px 20px; color: #4a3423;">{{ $order->customer_name ?: '-' }}</td>
+                                <td style="padding: 14px 20px; color: #666;">
+                                    {{ $order->items->count() }} รายการ 
+                                    <small style="color: #a38974;">({{ $order->items->sum('quantity') }} แก้ว)</small>
+                                </td>
+                                <td style="padding: 14px 20px; text-align: right; font-weight: 700; color: #4a3423;">฿{{ number_format($order->total, 2) }}</td>
+                                <td style="padding: 14px 20px; text-align: center;">
+                                    <span style="display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; 
+                                        @if($order->status == 'pending') background-color: #fff3cd; color: #856404;
+                                        @elseif($order->status == 'paid') background-color: #d4edda; color: #155724;
+                                        @elseif($order->status == 'cancelled') background-color: #f8d7da; color: #721c24;
+                                        @endif
+                                    ">
+                                        {{ $order->status_thai }}
+                                    </span>
+                                </td>
+                                <td style="padding: 14px 20px; text-align: center;">
+                                    <a href="{{ route('orders.show', $order) }}" style="display: inline-block; background-color: #6f4e37; color: white; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#4a3423'" onmouseout="this.style.backgroundColor='#6f4e37'">
+                                        🔍 ดูรายละเอียด
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" style="padding: 40px; text-align: center; color: #a38974;">
+                                    <div style="font-size: 2rem; margin-bottom: 10px;">📋</div>
+                                    <p>ยังไม่มีประวัติการสั่งซื้อ</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            
+            @if($orders->hasPages())
+                <div style="padding: 15px 20px; border-top: 1px solid #FFE8D6; background-color: #fdfbf9;">
+                    {{ $orders->links() }}
+                </div>
+            @endif
         </div>
     </div>
 @endsection

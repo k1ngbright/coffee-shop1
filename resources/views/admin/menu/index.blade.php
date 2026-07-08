@@ -296,7 +296,7 @@
                                 <span class="menu-price-text">{{ number_format($product->price, 2) }} ฿</span>
                             </td>
                             <td>
-                                @if($product->is_available == 1)
+                                @if($product->status)
                                     <span class="status-badge available">พร้อมขาย</span>
                                 @else
                                     <span class="status-badge unavailable">หมดชั่วคราว</span>
