@@ -80,6 +80,7 @@
         border-radius: 8px;
         font-size: 0.85rem;
         font-weight: 600;
+        display: inline-block;
     }
     .status-badge-large.available { background-color: #e6f4ea; color: #137333; }
     .status-badge-large.unavailable { background-color: #fce8e6; color: #c5221f; }
@@ -122,7 +123,8 @@
 
             <div class="info-bottom">
                 <span class="status-label-text">สถานะการขายปัจจุบัน:</span>
-                @if($product->status)
+                {{-- 🛠️ ปรับแก้ให้เช็กค่าเงื่อนไขตรงตามฐานข้อมูลตัวเลข 1 และ 0 ของเพื่อน --}}
+                @if($product->status == 1)
                     <span class="status-badge-large available">🟢 พร้อมจำหน่ายบนหน้าจอ POS</span>
                 @else
                     <span class="status-badge-large unavailable">🔴 สินค้าหมดชั่วคราว</span>
