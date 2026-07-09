@@ -22,7 +22,7 @@
 
 <body>
     <nav class="navbar">
-        <a href="{{ route('orders.index') }}" class="navbar-brand">
+        <a href="{{ route('menu') }}" class="navbar-brand">
             <span class="logo">☕</span>
             <span>Coffee Shop</span>
         </a>
