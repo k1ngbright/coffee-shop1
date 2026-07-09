@@ -183,7 +183,7 @@
 
         {{-- 2. หมวดหมู่สินค้า (วนลูปดึงตามอาร์เรย์จาก Controller เพื่อความยืดหยุ่น) --}}
         <div class="form-group">
-            <label for="category">หมวดหมู่ <span style="color: red;">*</span></label>
+            <label for="category">หมวดหมู <span style="color: red;">*</span></label>
             <select name="category" id="category" class="form-control" required>
                 <option value="" disabled selected>-- เลือกหมวดหมู่เมนู --</option>
                 @foreach($categories as $cat)
