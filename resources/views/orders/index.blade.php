@@ -284,7 +284,7 @@
 
     {{-- เมนูขายดี (Best Selling Dashboard) --}}
     <div class="container-fluid px-0" style="margin-top: 40px; margin-bottom: 20px;">
-        <h3 class="section-title">🔥 เมนูขายดีที่สุด</h3>
+        <h3 class="section-title"> เมนูขายดีที่สุด</h3>
         <p class="section-subtitle">เมนูฮิตยอดนิยมที่ลูกค้าสั่งมากที่สุด</p>
 
         @if($bestSellingProducts->count() > 0)
