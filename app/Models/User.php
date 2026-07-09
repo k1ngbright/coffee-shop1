@@ -31,6 +31,14 @@ class User extends Authenticatable
     }
 
     /**
+     * ตรวจสอบว่าเป็น admin หรือไม่
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
      * ออเดอร์ของผู้ใช้งาน
      */
     public function orders(): \Illuminate\Database\Eloquent\Relations\HasMany

@@ -17,8 +17,16 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $status = $request->query('status');
+        $user = auth()->user();
 
-        $orders = Order::with(['items.product', 'coupon'])
+        $ordersQuery = Order::with(['items.product', 'coupon']);
+
+        // Customer เห็นเฉพาะออเดอร์ของตัวเอง, Admin เห็นทั้งหมด
+        if (!$user->isAdmin()) {
+            $ordersQuery->where('user_id', $user->id);
+        }
+
+        $orders = $ordersQuery
             ->when($status, fn($q) => $q->where('status', $status))
             ->orderBy('created_at', 'desc')
             ->paginate(20);

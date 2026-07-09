@@ -7,27 +7,17 @@ use Illuminate\Http\Request;
 
 class CouponController extends Controller
 {
-    /**
-     * แสดงรายการคูปองทั้งหมด
-     */
     public function index()
     {
         $coupons = Coupon::orderBy('created_at', 'desc')->get();
-
         return view('coupons.index', compact('coupons'));
     }
 
-    /**
-     * หน้าฟอร์มเพิ่มคูปอง
-     */
     public function create()
     {
         return view('coupons.create');
     }
 
-    /**
-     * บันทึกคูปองใหม่
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -44,7 +34,6 @@ class CouponController extends Controller
             'code.unique' => 'รหัสคูปองนี้มีอยู่แล้ว',
             'discount_type.required' => 'กรุณาเลือกประเภทส่วนลด',
             'discount_value.required' => 'กรุณากรอกมูลค่าส่วนลด',
-            'discount_value.numeric' => 'มูลค่าส่วนลดต้องเป็นตัวเลข',
             'expire_date.after_or_equal' => 'วันหมดอายุต้องไม่ก่อนวันเริ่มใช้งาน',
         ]);
 
@@ -64,23 +53,13 @@ class CouponController extends Controller
         return redirect()->route('coupons.index')->with('success', 'เพิ่มคูปองเรียบร้อยแล้ว');
     }
 
-    /**
-     * หน้าฟอร์มแก้ไขคูปอง
-     */
-    public function edit($id)
+    public function edit(Coupon $coupon)
     {
-        $coupon = Coupon::findOrFail($id);
-
         return view('coupons.edit', compact('coupon'));
     }
 
-    /**
-     * อัปเดตคูปอง
-     */
-    public function update(Request $request, $id)
+    public function update(Request $request, Coupon $coupon)
     {
-        $coupon = Coupon::findOrFail($id);
-
         $request->validate([
             'code' => 'required|string|max:50|unique:coupons,code,' . $coupon->id,
             'discount_type' => 'required|in:percent,fixed',
@@ -113,14 +92,9 @@ class CouponController extends Controller
         return redirect()->route('coupons.index')->with('success', 'แก้ไขคูปองเรียบร้อยแล้ว');
     }
 
-    /**
-     * ลบคูปอง
-     */
-    public function destroy($id)
+    public function destroy(Coupon $coupon)
     {
-        $coupon = Coupon::findOrFail($id);
         $coupon->delete();
-
         return redirect()->route('coupons.index')->with('success', 'ลบคูปองเรียบร้อยแล้ว');
     }
 }
