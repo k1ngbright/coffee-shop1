@@ -424,6 +424,25 @@
         document.getElementById('formCouponCode').value = '';
     }
 
+    function submitOrder() {
+        if(cart.length === 0) return;
+
+        // Auto-fill from authenticated user profile if available
+        let defaultName = "{{ auth()->user()->name ?? '' }}";
+        let defaultPhone = "{{ auth()->user()->phone ?? '' }}";
+
+        const customerName = prompt("ชื่อลูกค้า (ไว้เรียกรับเครื่องดื่ม):", defaultName);
+        if(!customerName) return;
+
+        let customerPhone = defaultPhone;
+        if(document.querySelector('.payment-option.selected').textContent.includes('โอนเงิน')) {
+            customerPhone = prompt("เบอร์โทรศัพท์ (ไว้ติดต่อกรณีมีปัญหา):", defaultPhone);
+        }
+
+        document.getElementById('formCustomerName').value = customerName;
+        document.getElementById('formCustomerPhone').value = customerPhone || '';
+    }
+
     // ===== PAYMENT =====
     function selectPayment(method, btn) {
         paymentMethod = method;
