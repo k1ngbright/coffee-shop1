@@ -188,7 +188,7 @@
         color: #c5221f;
     }
     
-    /* 🛠️ ปรับปรุงสไตล์กลุ่มปุ่ม Action ให้กดง่ายและสมดุลขึ้น */
+    /* 🛠️ ปรับกลุ่มปุ่ม Action */
     .action-buttons {
         display: flex;
         gap: 8px;
@@ -206,7 +206,7 @@
         transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
-        gap: 6px; /* ระยะห่างระหว่างไอคอนกับตัวหนังสือ */
+        gap: 6px; 
         box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
     
@@ -216,10 +216,9 @@
     }
 
     .action-buttons .btn i {
-        font-size: 1rem; /* ขนาดของตัวไอคอน */
+        font-size: 1rem; 
     }
     
-    /* คุมโทนสีปุ่มให้อ่อนลง สบายตา ไม่ฉูดฉาดเกินไป */
     .btn-info { 
         background-color: #e4f2f5; 
         color: #117a8b; 
@@ -296,23 +295,23 @@
                                 <span class="menu-price-text">{{ number_format($product->price, 2) }} ฿</span>
                             </td>
                             <td>
-                                @if($product->status)
+                                {{-- 🛠️ ปรับเปลี่ยนการเช็กสถานะให้ดึงตามโครงสร้างคอลัมน์ฟิลด์เพื่อน --}}
+                                @if($product->status == 1)
                                     <span class="status-badge available">พร้อมขาย</span>
                                 @else
                                     <span class="status-badge unavailable">หมดชั่วคราว</span>
                                 @endif
                             </td>
                             <td>
-                                {{-- ปุ่ม Action รูปแบบใหม่ ขยายใหญ่ มีไอคอนและข้อความชัดเจน --}}
                                 <div class="action-buttons">
                                     <a href="{{ route('admin.menu.show', $product->id) }}" class="btn btn-info" title="ดูรายละเอียด">
-                                         ดูข้อมูล
+                                        <i class="bi bi-search"></i> ดูข้อมูล
                                     </a>
                                     <a href="{{ route('admin.menu.edit', $product->id) }}" class="btn btn-warning" title="แก้ไข">
-                                       แก้ไข
+                                        <i class="bi bi-pencil-square"></i> แก้ไข
                                     </a>
                                     <button type="button" class="btn btn-danger" onclick="deleteMenu({{ $product->id }})" title="ลบ">
-                                       ลบ
+                                        <i class="bi bi-trash3"></i> ลบ
                                     </button>
                                 </div>
                             </td>
@@ -353,7 +352,13 @@ function deleteMenu(id) {
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                 success: function(response) {
                     if(response.success) {
-                        Swal.fire({ title: 'ลบสำเร็จ!', text: response.message, icon: 'success', timer: 1500, showConfirmButton: false });
+                        Swal.fire({ 
+                            title: 'ลบสำเร็จ!', 
+                            text: response.message, 
+                            icon: 'success', 
+                            timer: 1500, 
+                            showConfirmButton: false 
+                        });
                         $('#row-' + id).fadeOut(500, function() { $(this).remove(); });
                     }
                 }
