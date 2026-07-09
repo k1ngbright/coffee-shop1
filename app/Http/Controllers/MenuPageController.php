@@ -15,5 +15,5 @@ class MenuPageController extends Controller
         $categories = Product::where('status', 1)->distinct()->pluck('category')->filter()->values();
 
         return view('menu', compact('products', 'categories'));
-    }
+    }  
 }
