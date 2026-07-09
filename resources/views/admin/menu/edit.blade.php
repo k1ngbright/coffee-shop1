@@ -132,7 +132,7 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">หมวดหมู่สินค้า <span class="required-star">*</span></label>
+                <label class="form-label">หมวด หมู่ สินค้า <span class="required-star">*</span></label>
                 <select name="category" class="form-select" required>
                     @foreach($categories as $cat)
                         <option value="{{ $cat }}" {{ old('category', $product->category) == $cat ? 'selected' : '' }}>{{ $cat }}</option>
