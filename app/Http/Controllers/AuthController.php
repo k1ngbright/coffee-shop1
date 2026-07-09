@@ -15,22 +15,39 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+{
+    // 1. ตรวจสอบข้อมูลที่รับมาจากหน้าฟอร์มเบลด
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
-            return redirect()->intended('/');
+    $remember = $request->has('remember');
+
+    // 2. ตรวจสอบการตรวจสอบสิทธิ์เข้าสู่ระบบ
+    if (auth()->attempt($credentials, $remember)) {
+        $request->session()->regenerate();
+
+        /**
+         * 🚀 [จุดแก้ไขสำคัญ] เช็กสถานะสิทธิ์ของผู้ใช้งาน
+         * สมมติว่าในตาราง users เพื่อนของคุณเก็บคอลัมน์สิทธิ์แอดมินด้วยฟิลด์ชื่อ 'role' หรือ 'is_admin'
+         */
+        $user = auth()->user();
+
+        // 🟢 เงื่อนไข: ถ้าเป็น Admin ให้ดีดตัวไปหน้าจัดการเมนูกาแฟของคุณทันที
+        if ($user->is_admin == 1 || $user->role === 'admin') { 
+            return redirect()->route('admin.menu.index');
         }
 
-        return back()->withErrors([
-            'email' => 'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
-        ])->onlyInput('email');
+        // 🔵 เงื่อนไขทั่วไป: ถ้าเป็นลูกค้าหรือ Guest ปกติ ให้เด้งไปหน้าสั่งออเดอร์/หน้าร้าน POS
+        return redirect()->intended(route('orders.index'));
     }
 
+    // 🔴 กรณีรหัสผ่านผิดพลาด ส่งข้อความกลับไปแจ้งเตือนในหน้าเบลด
+    return back()->withErrors([
+        'email' => 'อีเมลหรือรหัสผ่านไม่ถูกต้องในระบบ',
+    ])->withInput($request->only('email', 'remember'));
+}
     public function showRegister()
     {
         return view('auth.register');
