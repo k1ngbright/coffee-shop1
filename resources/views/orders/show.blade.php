@@ -90,7 +90,7 @@
                     </div>
                 </div>
 
-                @if($order->status === 'pending')
+                @if($order->status === 'pending' && auth()->user()->isAdmin())
                     <div class="status-change-section">
                         <form method="POST" action="{{ route('orders.update-status', $order) }}" style="flex:1">
                             @csrf
@@ -105,8 +105,41 @@
                             <button type="submit" class="btn btn-danger" style="width:100%" onclick="return confirm('ยืนยันยกเลิก?')">❌ ยกเลิก</button>
                         </form>
                     </div>
+                @elseif($order->status === 'pending' && !auth()->user()->isAdmin() && $order->user_id === auth()->id())
+                    <div class="status-change-section">
+                        <form method="POST" action="{{ route('orders.cancel', $order) }}" style="flex:1">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-outline" style="width:100%; color: #dc3545; border-color: #dc3545;" onclick="return confirm('ต้องการยกเลิกออเดอร์นี้ใช่หรือไม่?')">❌ ยกเลิกออเดอร์</button>
+                        </form>
+                    </div>
                 @endif
             </div>
+
+            {{-- Slip Upload Section --}}
+            @if($order->payment_method === 'โอนเงิน' && ($order->status === 'pending' || $order->payment_slip))
+            <div class="detail-card">
+                <div class="card-title">🧾 หลักฐานการโอนเงิน</div>
+                <div class="card-body">
+                    @if($order->payment_slip)
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <img src="{{ asset('storage/' . $order->payment_slip) }}" alt="Slip" style="max-width: 100%; max-height: 400px; border-radius: 8px; border: 1px solid var(--coffee-200);">
+                        </div>
+                    @endif
+
+                    @if($order->status === 'pending' && !auth()->user()->isAdmin() && $order->user_id === auth()->id())
+                        <form action="{{ route('orders.upload-slip', $order) }}" method="POST" enctype="multipart/form-data" style="margin-top: 10px;">
+                            @csrf
+                            <div style="margin-bottom: 10px;">
+                                <input type="file" name="slip" accept="image/jpeg,image/png,image/jpg" style="width: 100%; font-size: 0.9rem;" required>
+                                <small style="color: var(--coffee-400);">รองรับไฟล์ JPG, PNG ขนาดไม่เกิน 5MB</small>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">⬆️ อัพโหลดสลิป</button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+            @endif
 
             {{-- Customer & Order Info --}}
             <div class="detail-card">
@@ -150,4 +183,29 @@
             </div>
         </div>
     </div>
+    
+    @if($order->status === 'pending')
+    <script>
+        // Auto-refresh order status every 10 seconds
+        setInterval(() => {
+            fetch(window.location.href, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'text/html'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newStatusBadge = doc.querySelector('.order-meta .badge');
+                const currentStatusBadge = document.querySelector('.order-meta .badge');
+                
+                if (newStatusBadge && currentStatusBadge && newStatusBadge.textContent !== currentStatusBadge.textContent) {
+                    window.location.reload();
+                }
+            });
+        }, 10000);
+    </script>
+    @endif
 @endsection

@@ -73,6 +73,28 @@ class AuthController extends Controller
         return redirect('/');
     }
 
+    public function profile()
+    {
+        $user = Auth::user();
+        return view('auth.profile', compact('user'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        $user = Auth::user();
+        $user->update([
+            'name' => $request->name,
+            'phone' => $request->phone,
+        ]);
+
+        return redirect()->back()->with('success', 'อัปเดตข้อมูลส่วนตัวเรียบร้อยแล้ว');
+    }
+
     public function logout(Request $request)
     {
         Auth::logout();

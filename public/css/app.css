@@ -107,6 +107,35 @@ body {
     background: rgba(255,255,255,0.15);
 }
 
+.btn-logout {
+    background: rgba(255, 59, 48, 0.1);
+    border: 1px solid rgba(255, 59, 48, 0.3);
+    color: #ff6b6b;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-left: 0.5rem;
+}
+
+.btn-logout:hover {
+    background: #ff3b30;
+    color: white;
+    border-color: #ff3b30;
+    box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-logout:active {
+    transform: translateY(0);
+}
+
 /* ===== MAIN ===== */
 .main-content {
     padding: 1.5rem;

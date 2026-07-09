@@ -27,10 +27,19 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // ===== Order routes (ต้อง login ก่อน) =====
 Route::middleware('auth')->group(function () {
-    Route::resource('orders', OrderController::class)->only(['index', 'create', 'store', 'show']);
-    Route::get('/orders/{order}/receipt', [OrderController::class, 'receipt'])->name('orders.receipt');
-    Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
-    Route::post('/orders/apply-coupon', [OrderController::class, 'applyCoupon'])->name('orders.apply-coupon');
+    Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
+    Route::put('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
+    
+    // User-friendly URLs (keeping the same route names so blade files don't break)
+    Route::get('/history', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/shop', [OrderController::class, 'create'])->name('orders.create');
+    Route::post('/shop', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/order/{order}', [OrderController::class, 'show'])->name('orders.show');
+    
+    Route::get('/order/{order}/receipt', [OrderController::class, 'receipt'])->name('orders.receipt');
+    Route::patch('/order/{order}/cancel', [OrderController::class, 'cancelByUser'])->name('orders.cancel');
+    Route::post('/order/{order}/slip', [OrderController::class, 'uploadSlip'])->name('orders.upload-slip');
+    Route::post('/shop/apply-coupon', [OrderController::class, 'applyCoupon'])->name('orders.apply-coupon');
 });
 
 // ===== Admin routes (ต้อง login + เป็น admin) =====
@@ -40,6 +49,10 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::resource('coupons', CouponController::class);
 
     // กลุ่มระบบจัดการของ Admin ทั้งหมด (แก้ไขปีกกาซ้อนและจัดระเบียบให้ถูกต้อง)
+    // จัดการออเดอร์
+    Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
+
+    // จัดการเมนู
     Route::prefix('admin')->group(function () {
         
         // 🏠 1. หน้าแรกแผงควบคุมหลัก (Dashboard) - เรียกใช้งานฟังก์ชัน home ใน Controller

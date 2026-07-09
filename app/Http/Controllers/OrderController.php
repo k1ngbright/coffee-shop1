@@ -140,6 +140,8 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
+        abort_if(!auth()->user()->isAdmin() && $order->user_id !== auth()->id(), 403, 'Unauthorized action.');
+
         $order->load(['items.product', 'coupon']);
         return view('orders.show', compact('order'));
     }
@@ -149,6 +151,8 @@ class OrderController extends Controller
      */
     public function receipt(Order $order)
     {
+        abort_if(!auth()->user()->isAdmin() && $order->user_id !== auth()->id(), 403, 'Unauthorized action.');
+
         $order->load(['items.product', 'coupon']);
         return view('orders.receipt', compact('order'));
     }
@@ -164,7 +168,43 @@ class OrderController extends Controller
 
         $order->update(['status' => $request->status]);
 
-        return back()->with('success', 'อัพเดทสถานะออเดอร์ ' . $order->order_number . ' เป็น "' . $order->status_thai . '" สำเร็จ!');
+        return redirect()->back()->with('success', 'อัพเดทสถานะเป็น ' . $order->status_thai . ' แล้ว');
+    }
+
+    /**
+     * ลูกค้ายกเลิกออเดอร์เอง
+     */
+    public function cancelByUser(Order $order)
+    {
+        abort_if($order->user_id !== auth()->id() || $order->status !== 'pending', 403, 'ไม่สามารถยกเลิกออเดอร์นี้ได้');
+
+        $order->update(['status' => 'cancelled']);
+
+        return redirect()->back()->with('success', 'ยกเลิกออเดอร์เรียบร้อยแล้ว');
+    }
+
+    /**
+     * อัพโหลดสลิปโอนเงิน
+     */
+    public function uploadSlip(Request $request, Order $order)
+    {
+        abort_if($order->user_id !== auth()->id() || $order->status !== 'pending', 403, 'ไม่อนุญาต');
+
+        $request->validate([
+            'slip' => 'required|image|mimes:jpeg,png,jpg|max:5120', // max 5MB
+        ]);
+
+        if ($request->hasFile('slip')) {
+            // Delete old slip if exists
+            if ($order->payment_slip && \Illuminate\Support\Facades\Storage::disk('public')->exists($order->payment_slip)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($order->payment_slip);
+            }
+
+            $path = $request->file('slip')->store('slips', 'public');
+            $order->update(['payment_slip' => $path]);
+        }
+
+        return redirect()->back()->with('success', 'อัพโหลดสลิปเรียบร้อยแล้ว แอดมินจะตรวจสอบโดยเร็วที่สุด');
     }
 
     /**

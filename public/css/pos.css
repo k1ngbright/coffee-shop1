@@ -246,7 +246,6 @@
     border-radius: var(--radius);
     border: 1px solid var(--coffee-100);
     margin-bottom: 0.5rem;
-    animation: fadeIn 0.3s ease;
     background: var(--coffee-50);
     transition: all 0.2s;
 }

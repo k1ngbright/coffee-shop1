@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,12 +11,15 @@
     {{-- Google Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
     @yield('styles')
 </head>
+
 <body>
     <nav class="navbar">
         <a href="{{ route('menu') }}" class="navbar-brand">
@@ -24,11 +28,7 @@
         </a>
         <ul class="navbar-nav">
             {{-- ===== เมนูสำหรับทุกคน ===== --}}
-            <li>
-                <a href="{{ route('menu') }}" class="nav-link {{ request()->routeIs('menu') ? 'active' : '' }}">
-                    📋 เมนู
-                </a>
-            </li>
+
 
             @guest
                 {{-- ===== Guest: เข้าสู่ระบบ / สมัครสมาชิก ===== --}}
@@ -37,33 +37,32 @@
                         🔐 เข้าสู่ระบบ
                     </a>
                 </li>
-                <li>
-                    <a href="{{ route('register') }}" class="nav-link {{ request()->routeIs('register') ? 'active' : '' }}">
-                        📝 สมัครสมาชิก
-                    </a>
-                </li>
             @else
                 {{-- ===== ล็อกอินแล้ว: ทั้ง Customer & Admin ===== --}}
                 <li>
-                    <a href="{{ route('orders.index') }}" class="nav-link {{ request()->routeIs('orders.index') ? 'active' : '' }}">
+                    <a href="{{ route('orders.index') }}"
+                        class="nav-link {{ request()->routeIs('orders.index') ? 'active' : '' }}">
                         🏠 หน้าแรก
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('orders.create') }}" class="nav-link {{ request()->routeIs('orders.create') ? 'active' : '' }}">
+                    <a href="{{ route('orders.create') }}"
+                        class="nav-link {{ request()->routeIs('orders.create') ? 'active' : '' }}">
                         ☕ สั่งเครื่องดื่ม
                     </a>
                 </li>
 
-                @if(auth()->user()->isAdmin())
+                @if (auth()->user()->isAdmin())
                     {{-- ===== Admin Only ===== --}}
                     <li>
-                        <a href="{{ route('admin.menu.index') }}" class="nav-link {{ request()->routeIs('admin.menu.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.menu.index') }}"
+                            class="nav-link {{ request()->routeIs('admin.menu.*') ? 'active' : '' }}">
                             ⚙️ จัดการเมนู
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('coupons.index') }}" class="nav-link {{ request()->routeIs('coupons.*') ? 'active' : '' }}">
+                        <a href="{{ route('coupons.index') }}"
+                            class="nav-link {{ request()->routeIs('coupons.*') ? 'active' : '' }}">
                             🎟️ คูปอง
                         </a>
                     </li>
@@ -71,20 +70,25 @@
 
                 <li>
                     <a href="javascript:void(0);" onclick="toggleCart()" class="nav-link" style="color: var(--coffee-100);">
-                        🛒 ตะกร้า <span id="navCartCount" class="badge" style="background: var(--danger); color: white; margin-left: 4px;">0</span>
+                        🛒 ตะกร้า <span id="navCartCount" class="badge"
+                            style="background: var(--danger); color: white; margin-left: 4px;">0</span>
                     </a>
                 </li>
 
                 {{-- ===== User info + Logout ===== --}}
-                <li>
+                <li style="display: flex; align-items: center; gap: 8px;">
+                    <a href="{{ route('profile') }}" class="nav-link {{ request()->routeIs('profile') ? 'active' : '' }}"
+                        style="display: flex; align-items: center; gap: 4px;">
+                        👤 {{ auth()->user()->name }}
+                        @if (auth()->user()->isAdmin())
+                            <span
+                                style="background: #dc3545; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 10px;">ADMIN</span>
+                        @endif
+                    </a>
                     <form method="POST" action="{{ route('logout') }}" style="display: inline;">
                         @csrf
-                        <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer; font-family: inherit; font-size: inherit; color: inherit; padding: inherit;">
-                            👤 {{ auth()->user()->name }}
-                            @if(auth()->user()->isAdmin())
-                                <span style="background: #dc3545; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 10px; margin-left: 4px;">ADMIN</span>
-                            @endif
-                            <span style="opacity: 0.7; margin-left: 4px;">↪ ออก</span>
+                        <button type="submit" class="btn-logout" title="ออกจากระบบ">
+                            <span style="font-size: 1.1rem;">🚪</span> ออกจากระบบ
                         </button>
                     </form>
                 </li>
@@ -93,13 +97,13 @@
     </nav>
 
     <main class="main-content">
-        @if(session('success'))
+        @if (session('success'))
             <div class="flash-message flash-success">
                 ✅ {{ session('success') }}
             </div>
         @endif
 
-        @if(session('error'))
+        @if (session('error'))
             <div class="flash-message flash-error">
                 ❌ {{ session('error') }}
             </div>
@@ -123,4 +127,5 @@
         });
     </script>
 </body>
+
 </html>
