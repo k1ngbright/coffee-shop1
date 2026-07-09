@@ -35,17 +35,27 @@ Route::middleware('auth')->group(function () {
 
 // ===== Admin routes (ต้อง login + เป็น admin) =====
 Route::middleware(['auth', 'is_admin'])->group(function () {
+    
     // จัดการคูปอง
     Route::resource('coupons', CouponController::class);
 
-    // จัดการเมนู
+    // กลุ่มระบบจัดการของ Admin ทั้งหมด (แก้ไขปีกกาซ้อนและจัดระเบียบให้ถูกต้อง)
     Route::prefix('admin')->group(function () {
-        Route::get('admin/menu', [MenuController::class, 'index'])->name('admin.menu.index');
-        Route::get('admin/menu/create', [MenuController::class, 'create'])->name('admin.menu.create');
-        Route::post('admin/menu', [MenuController::class, 'store'])->name('admin.menu.store');
-        Route::get('admin/menu/{id}', [MenuController::class, 'show'])->name('admin.menu.show');
-        Route::get('admin/menu/{id}/edit', [MenuController::class, 'edit'])->name('admin.menu.edit');
-        Route::put('admin/menu/{id}', [MenuController::class, 'update'])->name('admin.menu.update');
+        
+        // 🏠 1. หน้าแรกแผงควบคุมหลัก (Dashboard) - เรียกใช้งานฟังก์ชัน home ใน Controller
+        Route::get('/home', [MenuController::class, 'home'])->name('admin.menu.home');
+
+        // ☕ 2. ระบบจัดการเมนูสินค้า
+        Route::get('/menu', [MenuController::class, 'index'])->name('admin.menu.index');
+        Route::get('/menu/create', [MenuController::class, 'create'])->name('admin.menu.create');
+        Route::post('/menu', [MenuController::class, 'store'])->name('admin.menu.store');
+        
+        // จัดเรียง Route parameter {id} ไว้ด้านล่างเพื่อป้องกัน Route ชนกัน
+        Route::get('/menu/{id}/edit', [MenuController::class, 'edit'])->name('admin.menu.edit');
+        Route::get('/menu/{id}', [MenuController::class, 'show'])->name('admin.menu.show');
+        Route::put('/menu/{id}', [MenuController::class, 'update'])->name('admin.menu.update');
         Route::delete('/menu/{id}', [MenuController::class, 'destroy'])->name('admin.menu.destroy');
-    });
+        // 📄 เพิ่มโค้ดนี้เข้าไปในกลุ่ม Route::prefix('admin')->group(...) 
+Route::get('/orders/{id}/items', [MenuController::class, 'getOrderItems'])->name('admin.orders.items');
+        });
 });
