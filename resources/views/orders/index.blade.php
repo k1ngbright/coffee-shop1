@@ -282,7 +282,8 @@
         </div> 
     </div>
 
-    {{-- เมนูขายดี (Best Selling Dashboard) --}}
+    {{-- เมนูขายดี (Best Selling Dashboard) - Admin Only --}}
+    @if(auth()->user()->isAdmin())
     <div class="container-fluid px-0" style="margin-top: 40px; margin-bottom: 20px;">
         <h3 class="section-title"> Bestselling Products</h3>
         <p class="section-subtitle">เมนูฮิตยอดนิยมที่ลูกค้าสั่งมากที่สุด</p>
@@ -367,11 +368,12 @@
             </div>
         @endif
     </div>
+    @endif
 
     {{-- ประวัติการสั่งซื้อ (Order History) --}}
     <div class="container-fluid px-0" style="margin-top: 50px; margin-bottom: 40px;">
-        <h3 class="section-title">🕒 ประวัติการสั่งซื้อ</h3>
-        <p class="section-subtitle">รายการออเดอร์ทั้งหมดที่เคยสั่งซื้อ</p>
+        <h3 class="section-title">🕒 {{ auth()->user()->isAdmin() ? 'ประวัติออเดอร์ทั้งร้าน' : 'ประวัติการสั่งซื้อของคุณ' }}</h3>
+        <p class="section-subtitle">{{ auth()->user()->isAdmin() ? 'รายการออเดอร์ทั้งหมดในระบบ' : 'รายการออเดอร์ที่คุณเคยสั่งซื้อ' }}</p>
 
         <div style="background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #f0e6dd; overflow: hidden;">
             <div style="overflow-x: auto;">

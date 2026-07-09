@@ -18,36 +18,77 @@
 </head>
 <body>
     <nav class="navbar">
-        <a href="{{ route('orders.index') }}" class="navbar-brand">
+        <a href="{{ route('menu') }}" class="navbar-brand">
             <span class="logo">☕</span>
             <span>Coffee Shop</span>
         </a>
         <ul class="navbar-nav">
+            {{-- ===== เมนูสำหรับทุกคน ===== --}}
             <li>
-                <a href="{{ route('orders.index') }}" class="nav-link {{ request()->routeIs('orders.index') ? 'active' : '' }}">
-                    🏠 หน้าแรก
+                <a href="{{ route('menu') }}" class="nav-link {{ request()->routeIs('menu') ? 'active' : '' }}">
+                    📋 เมนู
                 </a>
             </li>
-            <li>
-                <a href="{{ route('orders.create') }}" class="nav-link {{ request()->routeIs('orders.create') ? 'active' : '' }}">
-                     ☕ เครื่องดื่ม
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('admin.menu.index') }}" class="nav-link {{ request()->routeIs('admin.menu.*') ? 'active' : '' }}">
-                    ⚙️ จัดการเมนู
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('coupons.index') }}" class="nav-link {{ request()->routeIs('coupons.*') ? 'active' : '' }}">
-                    🎟️ คูปอง
-                </a>
-            </li>
-            <li>
-                <a href="javascript:void(0);" onclick="toggleCart()" class="nav-link" style="color: var(--coffee-100);">
-                    🛒 ตะกร้า <span id="navCartCount" class="badge" style="background: var(--danger); color: white; margin-left: 4px;">0</span>
-                </a>
-            </li>
+
+            @guest
+                {{-- ===== Guest: เข้าสู่ระบบ / สมัครสมาชิก ===== --}}
+                <li>
+                    <a href="{{ route('login') }}" class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}">
+                        🔐 เข้าสู่ระบบ
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('register') }}" class="nav-link {{ request()->routeIs('register') ? 'active' : '' }}">
+                        📝 สมัครสมาชิก
+                    </a>
+                </li>
+            @else
+                {{-- ===== ล็อกอินแล้ว: ทั้ง Customer & Admin ===== --}}
+                <li>
+                    <a href="{{ route('orders.index') }}" class="nav-link {{ request()->routeIs('orders.index') ? 'active' : '' }}">
+                        🏠 หน้าแรก
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('orders.create') }}" class="nav-link {{ request()->routeIs('orders.create') ? 'active' : '' }}">
+                        ☕ สั่งเครื่องดื่ม
+                    </a>
+                </li>
+
+                @if(auth()->user()->isAdmin())
+                    {{-- ===== Admin Only ===== --}}
+                    <li>
+                        <a href="{{ route('admin.menu.index') }}" class="nav-link {{ request()->routeIs('admin.menu.*') ? 'active' : '' }}">
+                            ⚙️ จัดการเมนู
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('coupons.index') }}" class="nav-link {{ request()->routeIs('coupons.*') ? 'active' : '' }}">
+                            🎟️ คูปอง
+                        </a>
+                    </li>
+                @endif
+
+                <li>
+                    <a href="javascript:void(0);" onclick="toggleCart()" class="nav-link" style="color: var(--coffee-100);">
+                        🛒 ตะกร้า <span id="navCartCount" class="badge" style="background: var(--danger); color: white; margin-left: 4px;">0</span>
+                    </a>
+                </li>
+
+                {{-- ===== User info + Logout ===== --}}
+                <li>
+                    <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                        @csrf
+                        <button type="submit" class="nav-link" style="background: none; border: none; cursor: pointer; font-family: inherit; font-size: inherit; color: inherit; padding: inherit;">
+                            👤 {{ auth()->user()->name }}
+                            @if(auth()->user()->isAdmin())
+                                <span style="background: #dc3545; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 10px; margin-left: 4px;">ADMIN</span>
+                            @endif
+                            <span style="opacity: 0.7; margin-left: 4px;">↪ ออก</span>
+                        </button>
+                    </form>
+                </li>
+            @endguest
         </ul>
     </nav>
 
