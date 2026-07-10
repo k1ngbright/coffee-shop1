@@ -59,6 +59,7 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
         Route::get('/home', [MenuController::class, 'home'])->name('admin.menu.home');
 
         // ☕ 2. ระบบจัดการเมนูสินค้า
+        Route::get('/menu', [MenuController::class, 'home'])->name('admin.menu.home'); // แก้ไขพิกัด View: เปลี่ยนจาก 'admin
         Route::get('/menu', [MenuController::class, 'index'])->name('admin.menu.index');
         Route::get('/menu/create', [MenuController::class, 'create'])->name('admin.menu.create');
         Route::post('/menu', [MenuController::class, 'store'])->name('admin.menu.store');
@@ -71,4 +72,4 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
         // 📄 เพิ่มโค้ดนี้เข้าไปในกลุ่ม Route::prefix('admin')->group(...) 
 Route::get('/orders/{id}/items', [MenuController::class, 'getOrderItems'])->name('admin.orders.items');
         });
-});
+}); 
